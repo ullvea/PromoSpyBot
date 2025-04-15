@@ -1,1 +1,1 @@
-BOT_TOKEN = "8111341457:AAEQUexqryPToMwatlAfqt0iYpzK04GlVww" #promo spy bot
+BOT_TOKEN = "8111341457:AAH92sYi4Nb1mA1tnVLPR0Yaog5_457diiM" #promo spy bot

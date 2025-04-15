@@ -1,26 +1,38 @@
+import asyncio
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import Command
+from data.config import BOT_TOKEN  # импортируем токен
 import logging
-from telegram.ext import Application, MessageHandler, filters
-from data.config import BOT_TOKEN
 
-
+# Запускаем логгирование
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
 )
 
-logger = logging.getLogger(__name__)
+# создаем диспетчер
+dp = Dispatcher()
 
 
-async def echo(update, context):
-    await update.message.reply_text(f'Я получил сообщение <{update.message.text}>')
+async def main():
+    bot = Bot(token=BOT_TOKEN)
+    await dp.start_polling(bot)
 
 
-def main():
-    application = Application.builder().token(BOT_TOKEN).build()
-    text_handler = MessageHandler(filters.TEXT, echo)
-    application.add_handler(text_handler)
-    application.run_polling()
+@dp.message(Command('start'))  # декоратор для обработчика команды start
+async def process_start_command(message: types.Message):
+    await message.reply("Привет! Я бот-парсер, готов помочь тебе собрать нужную информацию."
+                        " Скажи, что именно ты хочешь найти?")  # отправляет ответ на сообщение
 
 
-# Запускаем функцию main() в случае запуска скрипта.
+@dp.message(Command('help'))  # декоратор для обработчика команды help
+async def process_help_command(message: types.Message):
+    await message.reply("Напиши мне что-нибудь, и я отправлю этот текст тебе в ответ!")
+
+
+@dp.message()  # декоратор для обработчика прочих сообщений
+async def echo_message(message: types.Message):
+    await message.answer(message.text)  # отправляет обратно новое сообщение с тем же текстом
+
+
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())  # начинаем принимать сообщения
