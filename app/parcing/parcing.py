@@ -85,7 +85,7 @@ def find_info_item(driver, link):
 
     item_price = None
 
-    item_price_with_card = None
+    item_price_with_card = driver.find_element(By.XPATH, '//*[contains(text(),"&thinsp;")]')
 
     item_statistic = driver.find_element(By.CSS_SELECTOR, '[data-widget="webSingleProductScore"]').text
     item_raiting, item_number_of_comments = item_statistic.split(' • ')
@@ -95,7 +95,7 @@ def find_info_item(driver, link):
     first_tab_handle = window_handles[0]
     driver.switch_to.window(first_tab_handle)  # возвращаемся на самую первую страницу
 
-    return (item_name, item_article, item_raiting, item_number_of_comments)
+    return (item_name, item_article, item_raiting, item_number_of_comments, item_price_with_card)
 
 
 def get_info_ozon(product):

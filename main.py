@@ -1,8 +1,11 @@
 import asyncio
-from aiogram import Bot, Dispatcher, types
-from aiogram.filters import Command
-from data.config import BOT_TOKEN  # импортируем токен
+from aiogram import Bot, Dispatcher
+from aiogram.fsm.storage.memory import MemoryStorage
+
+from app.config import BOT_TOKEN  # импортируем токен
+from app.handlers import router
 import logging
+
 
 # Запускаем логгирование
 logging.basicConfig(
@@ -10,29 +13,17 @@ logging.basicConfig(
 )
 
 # создаем диспетчер
-dp = Dispatcher()
-
+bot = Bot(token=BOT_TOKEN)
+storage = MemoryStorage()
+dp = Dispatcher(storage=storage)
 
 async def main():
-    bot = Bot(token=BOT_TOKEN)
+    dp.include_router(router)
     await dp.start_polling(bot)
 
 
-@dp.message(Command('start'))  # декоратор для обработчика команды start
-async def process_start_command(message: types.Message):
-    await message.reply("Привет! Я бот-парсер, готов помочь тебе собрать нужную информацию."
-                        " Скажи, что именно ты хочешь найти?")  # отправляет ответ на сообщение
-
-
-@dp.message(Command('help'))  # декоратор для обработчика команды help
-async def process_help_command(message: types.Message):
-    await message.reply("Напиши мне что-нибудь, и я отправлю этот текст тебе в ответ!")
-
-
-@dp.message()  # декоратор для обработчика прочих сообщений
-async def echo_message(message: types.Message):
-    await message.answer(message.text)  # отправляет обратно новое сообщение с тем же текстом
-
-
 if __name__ == '__main__':
-    asyncio.run(main())  # начинаем принимать сообщения
+    try:
+        asyncio.run(main())  # начинаем принимать сообщения
+    except KeyboardInterrupt as e:
+        print('Программа закончилась!')
