@@ -4,8 +4,9 @@ from aiogram.enums import parse_mode
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 
+from aiogram.fsm.context import FSMContext
+
 import app.keyboards as kb
-from try2 import BOT_USERNAME
 
 router = Router()
 BOT_USERNAME = "PromoSpy_bot"
@@ -28,9 +29,9 @@ async def help_cmd(message: Message):
                         "📌 узнать какие ещё есть похожие товары по этому запросу\n\n"
 
                         "<b>Какие есть быстрые команды?</b>\n"
-                        f"\\help - помощь по боту\n"
-                        f"\\my_goods - товары, добавленные для отслеживания цен\n"
-                        "\\support - написать сообщение в случае некорректной работы бота\n"
+                        f"/help - помощь по боту\n"
+                        f"/my_goods - товары, добавленные для отслеживания цен\n"
+                        "/support - написать сообщение в случае некорректной работы бота\n"
                         "\n"
 
                         "<b>Что же можешь сделать ты:</b>\n"
@@ -57,8 +58,10 @@ async def get_photo(message: Message):
     # где фото можно указать ссылку из гугла
 
 
+
+
 @router.message()  # декоратор для обработчика прочих сообщений
-async def echo_message(message: Message, bot):
+async def common_message(message: Message, bot):
     response_message = await message.answer(f'Запрос принят, @{message.from_user.username}!\n'
                                             '💭Ещё чуть-чуть, готовлю ответ')
     # отправляет сообщение об обработке запроса, а затем удаляет его пока 5 сек, в дальнейшим пока
