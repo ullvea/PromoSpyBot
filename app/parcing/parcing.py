@@ -26,6 +26,8 @@ TIME_SLEEP = 2
 TIME_WAIT = 5
 page_scroll_down_times = 10
 
+class ParcingError(Exception):
+    pass
 
 def scroll(driver):
     for _ in range(page_scroll_down_times):
@@ -33,8 +35,13 @@ def scroll(driver):
         time.sleep(0.1)
 
 
-class ParcingError(Exception):
-    pass
+def init_driver(url):
+    driver = uc.Chrome()
+    driver.implicitly_wait(TIME_WAIT)
+    driver.get(url)
+    time.sleep(TIME_SLEEP)
+
+    return driver
 
 
 def get_info_Ymarket(product):
@@ -61,17 +68,39 @@ def get_info_WB(product):
     input_window.send_keys(Keys.ENTER)
     time.sleep(TIME_SLEEP)
 
+    item_links = driver.find_elements(By.CLASS_NAME, 'tile-clickable-element')
+    item_links = list(set([f'{item.get_attribute("href")}' for item in item_links]))
+    print(item_links)
+
     driver.close()
     driver.quit()
 
 
-def init_driver(url):
-    driver = uc.Chrome()
-    driver.implicitly_wait(TIME_WAIT)
-    driver.get(url)
+
+def get_info_ozon(product):
+    driver = init_driver(OZON_url)
+
+    input_window = driver.find_element(By.NAME, 'text')
+    input_window.send_keys(product)
     time.sleep(TIME_SLEEP)
 
-    return driver
+    input_window.send_keys(Keys.ENTER)
+    time.sleep(TIME_SLEEP)
+
+    current_url = f'{driver.current_url}'  # параметр с озона
+    time.sleep(TIME_SLEEP)
+
+    item_links = driver.find_elements(By.CLASS_NAME, 'tile-clickable-element')
+    item_links = list(set([f'{item.get_attribute("href")}' for item in item_links]))
+
+    products_dict = dict()
+    for link in item_links:
+        info_of_product = find_info_item(driver, link)
+        print(info_of_product)
+        return
+
+    driver.close()
+    driver.quit()
 
 
 def find_info_item(driver, link):
@@ -117,30 +146,5 @@ def find_info_item(driver, link):
     return d
 
 
-def get_info_ozon(product):
-    driver = init_driver(OZON_url)
-
-    input_window = driver.find_element(By.NAME, 'text')
-    input_window.send_keys(product)
-    time.sleep(TIME_SLEEP)
-
-    input_window.send_keys(Keys.ENTER)
-    time.sleep(TIME_SLEEP)
-
-    current_url = f'{driver.current_url}'  # параметр с озона
-    time.sleep(TIME_SLEEP)
-
-    item_links = driver.find_elements(By.CLASS_NAME, 'tile-clickable-element')
-    item_links = list(set([f'{item.get_attribute("href")}' for item in item_links]))
-
-    products_dict = dict()
-    for link in item_links:
-        info_of_product = find_info_item(driver, link)
-        print(info_of_product)
-        return
-
-    driver.close()
-    driver.quit()
-
-
-get_info_ozon('тапочки')
+#get_info_ozon('тапочки')
+get_info_WB('тапочки')
