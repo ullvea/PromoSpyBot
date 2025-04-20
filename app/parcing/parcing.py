@@ -12,7 +12,8 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
 import undetected_chromedriver as uc  # расширение библиотеки Selenium
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup as bs
+import requests
 
 import time
 import json
@@ -77,25 +78,43 @@ def find_info_item(driver, link):
     driver.switch_to.new_window('tab')
     driver.get(link)
 
-    item_name = driver.find_element(By.CSS_SELECTOR, '[data-widget="webProductHeading"]').text
-    item_name = item_name.split(', <undetected_chromedriver.webelement.WebElement')[0].replace('\nещё', '')
+    soup = bs(str(driver.page_source), "lxml")
 
-    item_article = driver.find_element(By.XPATH, '//div[contains(text(), "Артикул:")]').text
-    item_article = item_article.replace('Артикул: ', '')
+    item_name = soup.find(attrs={"data-widget": "webProductHeading"}).get_text(strip=True)
 
-    item_price = None
+    item_article = soup.find('div', string=lambda text: "Артикул:" in text).get_text(strip=True)
 
-    item_price_with_card = driver.find_element(By.XPATH, '//*[contains(text(),"&thinsp;")]')
+    find_data_state = soup.find_all('div', attrs={'data-state': True})
+    item_price, item_price_with_card = None, None
 
-    item_statistic = driver.find_element(By.CSS_SELECTOR, '[data-widget="webSingleProductScore"]').text
-    item_raiting, item_number_of_comments = item_statistic.split(' • ')
+    for element in find_data_state:
+        state_json = json.loads(element['data-state'])
+        if 'cardPrice' in state_json:
+            #print(state_json)
+            item_price = state_json['price']
+            item_price_with_card = state_json['cardPrice']
+            break
+
+    state_json_2 = json.loads(soup.find('script', type='application/ld+json').string)
+    item_card = state_json_2["image"]
+    item_raiting = state_json_2["aggregateRating"]["ratingValue"]
+    item_number_of_comments = state_json_2["aggregateRating"]["reviewCount"]
+
+    d = {"item_name": item_name,
+         "item_article": item_article,
+         "link": link,
+         "item_price": item_price,
+         "item_price_with_card": item_price_with_card,
+         "item_raiting": item_raiting,
+         "item_number_of_comments": item_number_of_comments,
+         "item_card": item_card}
 
     driver.close()  # закрываем данную вкладку
     window_handles = driver.window_handles
     first_tab_handle = window_handles[0]
     driver.switch_to.window(first_tab_handle)  # возвращаемся на самую первую страницу
 
-    return (item_name, item_article, item_raiting, item_number_of_comments, item_price_with_card)
+    return d
 
 
 def get_info_ozon(product):
