@@ -10,3 +10,8 @@ start_keyboard = ReplyKeyboardMarkup(keyboard=[
 help_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Узнай как пользоваться ботом 🤖')]
 ])
+
+# обязательно дописывать url
+settings = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='где это блять работает', url='https://youtube.com/playlist?list=PLV0FNhq3XMOJ31X9eBWLIZJ4OVjBwb-KM&si=mVrn66eBvb0sFVdh')]
+])
