@@ -3,21 +3,25 @@ from aiogram.types import (ReplyKeyboardMarkup, KeyboardButton,
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 start_keyboard = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='Узнать как пользоваться ботом 🤖⚡')]
+    [KeyboardButton(text='Узнай как пользоваться ботом 🤖⚡')]
 ],
     resize_keyboard=True,
     input_field_placeholder='Нажми кнопку, чтобы узнать всё про этого бота')
 
 help_keyboard = ReplyKeyboardMarkup(keyboard=[
+    [KeyboardButton(text='Сравнить цены на маркетплейсах 📈'), KeyboardButton(text='Добавить в товар в отслеживание 💸')],
+    [KeyboardButton(text='Узнать цены похожих на товаров в магазине 🛍️')],
     [KeyboardButton(text='Узнай как пользоваться ботом 🤖')]
-])
+], resize_keyboard=True)
 
-# обязательно дописывать url
-settings = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='help', callback_data='help')],
-    [InlineKeyboardButton(text='my_goods', callback_data='my_goods')],
-    [InlineKeyboardButton(text='support', callback_data='support')],
-])
+shops_keyboard = ReplyKeyboardMarkup(keyboard=[
+    [KeyboardButton(text='Ozon')],
+    [KeyboardButton(text='Wildberries')],
+    [KeyboardButton(text='ЯндексМаркет')]
+],
+    resize_keyboard=True)
+
+
 
 # инлайны в сообщении при start
 websites = ['OZON', 'WB', 'YandexMarket']

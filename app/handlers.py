@@ -4,12 +4,15 @@ from aiogram.enums import parse_mode
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 
+from app.parcing.parcing import get_info_ozon, get_info_Ymarket
+
 from aiogram.fsm.context import FSMContext
 
 import app.keyboards as kb
 
 router = Router()
 BOT_USERNAME = "PromoSpy_bot"
+PRODUCT = None
 
 
 @router.message(CommandStart())  # декоратор для обработчика команды start
@@ -18,7 +21,7 @@ async def process_start_command(message: Message):
         f"Привет, @{message.from_user.username}! 👋 \n Я бот-парсер, готов помочь тебе собрать нужную информацию."
         " Скажи, что именно ты хочешь найти? \n Ниже представлены ссылки на сайты, в которых мы ищем нужный Вам товар",
         reply_markup=await kb.inline_web()
-)  # отправляет ответ на сообщение
+    )  # отправляет ответ на сообщение
 
 
 @router.message(F.text.contains("Узнать как пользоваться ботом 🤖⚡"))
@@ -38,7 +41,7 @@ async def help_cmd(message: Message):
                         "<b>Что же можешь сделать ты:</b>\n"
                         "📌 можешь отправить мне название товара или же скинуть его фотку, "
                         "в ответ я скину тебе информацию об этом товаре из разных источников.",
-                        parse_mode="HTML", reply_markup=kb.settings)
+                        parse_mode="HTML", reply_markup=await kb.inline_web())
 
 
 @router.message(Command('support'))
@@ -59,10 +62,59 @@ async def get_photo(message: Message):
     # где фото можно указать ссылку из гугла
 
 
+# reply_markup=kb.help_keyboard
+
+@router.message(F.text.contains('Добавить в товар в отслеживание 💸'))
+async def common_message(message: Message, bot):
+    await thinking_message(message, bot)
+
+
+@router.message(F.text.contains('Сравнить цены на маркетплейсах 📈'))
+async def common_message(message: Message, bot):
+    await thinking_message(message, bot)
+
+
+@router.message(F.text.contains('Узнать цены похожих на товаров в магазине 🛍️'))
+async def common_message(message: Message, bot):
+    await message.reply('Выберите нужный Вам магазин на клавиатуре',
+                        reply_markup=kb.shops_keyboard)
+
+
+@router.message(F.text.contains('Ozon'))
+async def common_message(message: Message, bot):
+    global PRODUCT
+    ans = get_info_ozon(PRODUCT, 3)
+    mes = ''
+    for item in ans:
+        mini_mes = ''
+        for key, val in item.items():
+            mini_mes += val
+        mini_mes += '\n'
+        mes += mini_mes
+    await message.reply(mes)
+    #await thinking_message(message, bot)
+
+
+@router.message(F.text.contains('Wildberries'))
+async def common_message(message: Message, bot):
+    await thinking_message(message, bot)
+
+
+@router.message(F.text.contains('ЯндексМаркет'))
+async def common_message(message: Message, bot):
+    await thinking_message(message, bot)
 
 
 @router.message()  # декоратор для обработчика прочих сообщений
 async def common_message(message: Message, bot):
+    global PRODUCT
+    PRODUCT = message.text
+    print(PRODUCT)
+    await message.answer(f'Выберите, что Вы хотите сделать с данным товаром на клавиатуре:',
+                         reply_markup=kb.help_keyboard)
+
+
+async def thinking_message(message: Message, bot):
     response_message = await message.answer(f'Запрос принят, @{message.from_user.username}!\n'
                                             '💭Ещё чуть-чуть, готовлю ответ')
     # отправляет сообщение об обработке запроса, а затем удаляет его пока 5 сек, в дальнейшим пока

@@ -13,6 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 import undetected_chromedriver as uc  # расширение библиотеки Selenium
 
 from bs4 import BeautifulSoup as bs
+import asyncio
 import requests
 
 import time
@@ -205,7 +206,7 @@ def find_info_item_wb(driver, link):
     return 'z'
 
 
-def get_info_ozon(product):
+def get_info_ozon(product, count=10):
     driver = init_driver(OZON_url)
 
     input_window = driver.find_element(By.NAME, 'text')
@@ -221,14 +222,15 @@ def get_info_ozon(product):
     item_links = driver.find_elements(By.CLASS_NAME, 'tile-clickable-element')
     item_links = list(set([f'{item.get_attribute("href")}' for item in item_links]))
 
-    products_dict = dict()
-    for link in item_links:
-        info_of_product = find_info_item(driver, link)
-        print(info_of_product)
-        return
+    products = []
+    for link in range(min(len(item_links), count)):
+        products.append(find_info_item(driver, item_links[link]))
+        # print(info_of_product)
 
     driver.close()
     driver.quit()
+
+    return products
 
 
 def find_info_item(driver, link):
@@ -276,4 +278,4 @@ def find_info_item(driver, link):
 
 # get_info_ozon('тапочки')
 # get_info_WB('тапочки')
-get_info_Ymarket('самовар')
+#get_info_Ymarket('самовар')
