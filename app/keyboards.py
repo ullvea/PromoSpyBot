@@ -12,12 +12,12 @@ help_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Узнай как пользоваться ботом 🤖')]
 ])
 
-# # обязательно дописывать url
-# settings = InlineKeyboardMarkup(inline_keyboard=[
-#     [InlineKeyboardButton(text='/help', callback_data='help')],
-#     [InlineKeyboardButton(text='/my_goods', callback_data='my_goods')],
-#     [InlineKeyboardButton(text='/support', callback_data='support')],
-# ])
+# обязательно дописывать url
+settings = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='help', callback_data='help')],
+    [InlineKeyboardButton(text='my_goods', callback_data='my_goods')],
+    [InlineKeyboardButton(text='support', callback_data='support')],
+])
 
 # инлайны в сообщении при start
 websites = ['OZON', 'WB', 'YandexMarket']
