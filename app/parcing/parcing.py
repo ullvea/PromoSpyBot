@@ -47,7 +47,7 @@ def init_driver(url):
     return driver
 
 
-def get_info_Ymarket(product):
+def get_info_Ymarket(product, count=10):
     driver = init_driver(YMarket_url)
 
     input_window = driver.find_element(By.NAME, 'text')
@@ -61,15 +61,16 @@ def get_info_Ymarket(product):
 
     item_links = driver.find_elements(By.CSS_SELECTOR, '[data-auto="galleryLink"]')
     item_links = list(set([f'{item.get_attribute("href")}' for item in item_links]))
-    print(item_links)
+    products = []
 
-    for link in item_links:
-        info_of_product = find_info_item_ymarket(driver, link)
-        print(info_of_product)
-        return
+    for link in range(min(len(item_links), count)):
+        products.append(find_info_item_ymarket(driver, item_links[link]))
+
 
     driver.close()
     driver.quit()
+
+    return products
 
 
 def find_info_item_ymarket(driver, link):
@@ -77,8 +78,6 @@ def find_info_item_ymarket(driver, link):
     driver.get(link)
 
     soup = bs(str(driver.page_source), "lxml")
-    with open('no commit/one_pr_ym.html', 'w', encoding='utf-8') as f:
-        f.write(str(soup))
 
     jsons = soup.find_all('script', type='application/ld+json')
     for js in jsons:

@@ -112,7 +112,17 @@ async def common_message(message: Message, bot):
 
 @router.message(F.text.contains('ЯндексМаркет'))
 async def common_message(message: Message, bot):
-    await thinking_message(message, bot)
+    global PRODUCT
+    ans = get_info_Ymarket(PRODUCT, 3)
+    mes = ""
+    photos = await asyncio.gather(*[download_photo(url['item_card']) for url in ans])
+    for item in ans:
+        mes += format_message(item)
+    photos[-1].caption = mes
+    photos[-1].parse_mode = "HTML"
+
+    # Отправляем группу фотографий
+    await bot.send_media_group(chat_id=message.chat.id, media=photos)
 
 
 @router.message()  # декоратор для обработчика прочих сообщений
