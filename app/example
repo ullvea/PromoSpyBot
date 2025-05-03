@@ -1,0 +1,8 @@
+{"item_name": item_name,
+                 "item_article": item_article,
+                 "link": link,
+                 "item_price": item_price,
+                 "item_price_with_card": item_price_with_card,
+                 "item_raiting": item_raiting,
+                 "item_number_of_comments": item_number_of_comments,
+                 "item_card": item_card}
