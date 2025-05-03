@@ -1,12 +1,13 @@
 import asyncio
+import requests
+
 from aiogram import F, Router
-from aiogram.enums import parse_mode
 from aiogram.filters import CommandStart, Command
-from aiogram.types import Message
+from aiogram.types import Message, InputMediaPhoto, InputFile, FSInputFile
+import aiohttp
 
 from app.parcing.parcing import get_info_ozon, get_info_Ymarket
 
-from aiogram.fsm.context import FSMContext
 
 import app.keyboards as kb
 
@@ -41,7 +42,7 @@ async def help_cmd(message: Message):
                         "<b>Что же можешь сделать ты:</b>\n"
                         "📌 можешь отправить мне название товара или же скинуть его фотку, "
                         "в ответ я скину тебе информацию об этом товаре из разных источников.",
-                        parse_mode="HTML", reply_markup=await kb.inline_web())
+                        parse_mode="HTML", reply_markup=kb.start_keyboard)
 
 
 @router.message(Command('support'))
@@ -54,11 +55,11 @@ async def get_photo(message: Message):
     await message.answer(message.photo[1].file_id)
 
 
-@router.message(Command('get_photo'))
-async def get_photo(message: Message):
-    await message.answer_photo(
-        photo="AgACAgIAAxkBAANjaAIHz78dRbUq3xqJlQ99XFKSliEAAobrMRsb6BFIK2F21syNTTEBAAMCAANtAAM2BA",
-        caption='так выглядит подпись')
+# @router.message(Command('get_photo'))
+# async def get_photo(message: Message):
+#     await message.answer_photo(
+#         photo="AgACAgIAAxkBAANjaAIHz78dRbUq3xqJlQ99XFKSliEAAobrMRsb6BFIK2F21syNTTEBAAMCAANtAAM2BA",
+#         caption='так выглядит подпись')
     # где фото можно указать ссылку из гугла
 
 
@@ -80,20 +81,29 @@ async def common_message(message: Message, bot):
                         reply_markup=kb.shops_keyboard)
 
 
+def format_message(mes: dict):
+    return (f'<b>{mes['item_name']}</b>\n'
+            f'{mes['item_article']}\n'
+            f'Цена/цена по карте: {mes['item_price']} / {mes['item_price_with_card']}\n'
+            f'Рейтинг/комментарии: {mes['item_raiting']}⭐️ / {mes['item_number_of_comments']}💬\n\n')
+
+async def download_photo(url):
+    return InputMediaPhoto(media=url)
+
+
 @router.message(F.text.contains('Ozon'))
 async def common_message(message: Message, bot):
     global PRODUCT
     ans = get_info_ozon(PRODUCT, 3)
-    mes = ''
+    mes = ""
+    photos = await asyncio.gather(*[download_photo(url['item_card']) for url in ans])
     for item in ans:
-        mini_mes = ''
-        for key, val in item.items():
-            mini_mes += val
-        mini_mes += '\n'
-        mes += mini_mes
-    await message.reply(mes)
-    #await thinking_message(message, bot)
+        mes += format_message(item)
+    photos[-1].caption = mes
+    photos[-1].parse_mode = "HTML"
 
+    # Отправляем группу фотографий
+    await bot.send_media_group(chat_id=message.chat.id, media=photos)
 
 @router.message(F.text.contains('Wildberries'))
 async def common_message(message: Message, bot):

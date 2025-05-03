@@ -9,7 +9,8 @@ start_keyboard = ReplyKeyboardMarkup(keyboard=[
     input_field_placeholder='Нажми кнопку, чтобы узнать всё про этого бота')
 
 help_keyboard = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='Сравнить цены на маркетплейсах 📈'), KeyboardButton(text='Добавить в товар в отслеживание 💸')],
+    [KeyboardButton(text='Сравнить цены на маркетплейсах 📈'),
+     KeyboardButton(text='Добавить в товар в отслеживание 💸')],
     [KeyboardButton(text='Узнать цены похожих на товаров в магазине 🛍️')],
     [KeyboardButton(text='Узнай как пользоваться ботом 🤖')]
 ], resize_keyboard=True)

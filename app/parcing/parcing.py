@@ -77,7 +77,7 @@ def find_info_item_ymarket(driver, link):
     driver.get(link)
 
     soup = bs(str(driver.page_source), "lxml")
-    with open('one_pr_ym.html', 'w', encoding='utf-8') as f:
+    with open('no commit/one_pr_ym.html', 'w', encoding='utf-8') as f:
         f.write(str(soup))
 
     jsons = soup.find_all('script', type='application/ld+json')
@@ -162,7 +162,7 @@ def find_info_item_wb(driver, link):
     driver.get(link)
 
     soup = bs(str(driver.page_source), "lxml")
-    with open('one_pr_wb.html', 'w', encoding='utf-8') as f:
+    with open('no commit/one_pr_wb.html', 'w', encoding='utf-8') as f:
         f.write(str(soup))
 
     item_name = soup.find('h1', {'class': 'product-page__title'}).get_text(strip=True)
@@ -256,8 +256,16 @@ def find_info_item(driver, link):
 
     state_json_2 = json.loads(soup.find('script', type='application/ld+json').string)
     item_card = state_json_2["image"]
-    item_raiting = state_json_2["aggregateRating"]["ratingValue"]
-    item_number_of_comments = state_json_2["aggregateRating"]["reviewCount"]
+
+    try:
+        item_raiting = state_json_2["aggregateRating"]["ratingValue"]
+    except KeyError:
+        item_raiting = None
+
+    try:
+        item_number_of_comments = state_json_2["aggregateRating"]["reviewCount"]
+    except KeyError:
+        item_number_of_comments = None
 
     d = {"item_name": item_name,
          "item_article": item_article,
@@ -276,6 +284,6 @@ def find_info_item(driver, link):
     return d
 
 
-# get_info_ozon('тапочки')
+#get_info_ozon('тапочки')
 # get_info_WB('тапочки')
 #get_info_Ymarket('самовар')
