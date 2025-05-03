@@ -94,6 +94,8 @@ async def download_photo(url):
 @router.message(F.text.contains('Ozon'))
 async def common_message(message: Message, bot):
     global PRODUCT
+    thinking_message = await message.answer(f'Запрос принят, @{message.from_user.username}!\n'
+                         '💭Ещё чуть-чуть, готовлю ответ')
     ans = get_info_ozon(PRODUCT, 3)
     mes = ""
     photos = await asyncio.gather(*[download_photo(url['item_card']) for url in ans])
@@ -102,17 +104,21 @@ async def common_message(message: Message, bot):
     photos[-1].caption = mes
     photos[-1].parse_mode = "HTML"
 
+    await bot.delete_message(thinking_message.chat.id, thinking_message.message_id)
     # Отправляем группу фотографий
     await bot.send_media_group(chat_id=message.chat.id, media=photos)
 
-@router.message(F.text.contains('Wildberries'))
-async def common_message(message: Message, bot):
-    await thinking_message(message, bot)
+# @router.message(F.text.contains('Wildberries'))
+# async def common_message(message: Message, bot):
+#     await thinking_message(message, bot)
 
 
 @router.message(F.text.contains('ЯндексМаркет'))
 async def common_message(message: Message, bot):
     global PRODUCT
+    thinking_message = await message.answer(f'Запрос принят, @{message.from_user.username}!\n'
+                                            '💭Ещё чуть-чуть, готовлю ответ')
+
     ans = get_info_Ymarket(PRODUCT, 3)
     mes = ""
     photos = await asyncio.gather(*[download_photo(url['item_card']) for url in ans])
@@ -121,6 +127,7 @@ async def common_message(message: Message, bot):
     photos[-1].caption = mes
     photos[-1].parse_mode = "HTML"
 
+    await bot.delete_message(thinking_message.chat.id, thinking_message.message_id)
     # Отправляем группу фотографий
     await bot.send_media_group(chat_id=message.chat.id, media=photos)
 
@@ -134,18 +141,18 @@ async def common_message(message: Message, bot):
                          reply_markup=kb.help_keyboard)
 
 
-async def thinking_message(message: Message, bot):
-    response_message = await message.answer(f'Запрос принят, @{message.from_user.username}!\n'
-                                            '💭Ещё чуть-чуть, готовлю ответ')
-    # отправляет сообщение об обработке запроса, а затем удаляет его пока 5 сек, в дальнейшим пока
-    # не сгенерируется запрос
-    await delete_message(response_message.chat.id, response_message.message_id, 5, bot)
-
-
-# Функция для удаления сообщения через заданное время
-async def delete_message(chat_id, message_id, delay, bot):
-    await asyncio.sleep(delay)
-    await bot.delete_message(chat_id, message_id)
+# async def thinking_message(message: Message, bot):
+#     response_message = await message.answer(f'Запрос принят, @{message.from_user.username}!\n'
+#                                             '💭Ещё чуть-чуть, готовлю ответ')
+#     # отправляет сообщение об обработке запроса, а затем удаляет его пока 5 сек, в дальнейшим пока
+#     # не сгенерируется запрос
+#     await delete_message(response_message.chat.id, response_message., 5, bot)
+#
+#
+# # Функция для удаления сообщения через заданное время
+# async def delete_message(chat_id, message_id, delay, bot):
+#     await asyncio.sleep(delay)
+#     await bot.delete_message(chat_id, message_id)
 
 # @router.callback_query(F.data == 'catalog')
 # async def catalog(callback: CallbackQuery):
