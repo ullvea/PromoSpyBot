@@ -4,14 +4,22 @@ from aiogram import F, Router
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, InputMediaPhoto
 
-from parcing.parcing import get_info_ozon, get_info_Ymarket
-
+from parcing.parcing_ozon import get_info_ozon
+from parcing.parcing_ym import get_info_Ymarket
+from parcing.analyzing import generate_answer
+from bs4 import BeautifulSoup as bs
 
 import app.keyboards as kb
 
 router = Router()
 BOT_USERNAME = "PromoSpy_bot"
 PRODUCT = None
+
+
+# @router.message()
+# async def simple_ai(message: Message):
+#     r = generate_answer(message.text)
+#     await message.answer(r, parse_mode="Markdown")
 
 
 @router.message(CommandStart())  # декоратор для обработчика команды start
@@ -58,20 +66,25 @@ async def get_photo(message: Message):
 #     await message.answer_photo(
 #         photo="AgACAgIAAxkBAANjaAIHz78dRbUq3xqJlQ99XFKSliEAAobrMRsb6BFIK2F21syNTTEBAAMCAANtAAM2BA",
 #         caption='так выглядит подпись')
-    # где фото можно указать ссылку из гугла
+# где фото можно указать ссылку из гугла
 
 
 # reply_markup=kb.help_keyboard
 
 @router.message(F.text.contains('Добавить в товар в отслеживание 💸'))
 async def common_message(message: Message, bot):
-    #await thinking_message(message, bot)
-    pass
+    global PRODUCT
+    if PRODUCT.startswith(('http://', 'https://')):
+        soup = bs(message.text, "lxml")
+        await message.answer('Отлично! Мы сообщим Вам об обновлениях!')
+    else:
+        "тут надо диалгои"
+        await message.answer("Отправьте ссылку")
 
 
 @router.message(F.text.contains('Сравнить цены на маркетплейсах 📈'))
 async def common_message(message: Message, bot):
-    #await thinking_message(message, bot)
+    # await thinking_message(message, bot)
     pass
 
 
@@ -82,10 +95,11 @@ async def common_message(message: Message, bot):
 
 
 def format_message(mes: dict):
-    return (f'<b>{mes['item_name']}</b>\n'
-            f'{mes['item_article']}\n'
-            f'Цена/цена по карте: {mes['item_price']} / {mes['item_price_with_card']}\n'
-            f'Рейтинг/комментарии: {mes['item_raiting']}⭐️ / {mes['item_number_of_comments']}💬\n\n')
+    return (f"<b>{mes['item_name']}</b>\n"
+            f"{mes['item_article']}\n"
+            f"Цена/цена по карте: {mes['item_price']} / {mes['item_price_with_card']}\n"
+            f"Рейтинг/комментарии: {mes['item_raiting']}⭐️ / {mes['item_number_of_comments']}💬\n\n")
+
 
 async def download_photo(url):
     return InputMediaPhoto(media=url)
@@ -95,7 +109,7 @@ async def download_photo(url):
 async def common_message(message: Message, bot):
     global PRODUCT
     thinking_message = await message.answer(f'Запрос принят, @{message.from_user.username}!\n'
-                         '💭Ещё чуть-чуть, готовлю ответ')
+                                            '💭Ещё чуть-чуть, готовлю ответ')
     ans = get_info_ozon(PRODUCT, 3)
     mes = ""
     photos = await asyncio.gather(*[download_photo(url['item_card']) for url in ans])
@@ -107,6 +121,7 @@ async def common_message(message: Message, bot):
     await bot.delete_message(thinking_message.chat.id, thinking_message.message_id)
     # Отправляем группу фотографий
     await bot.send_media_group(chat_id=message.chat.id, media=photos)
+
 
 # @router.message(F.text.contains('Wildberries'))
 # async def common_message(message: Message, bot):
@@ -139,7 +154,6 @@ async def common_message(message: Message, bot):
     print(PRODUCT)
     await message.answer(f'Выберите, что Вы хотите сделать с данным товаром на клавиатуре:',
                          reply_markup=kb.help_keyboard)
-
 
 # async def thinking_message(message: Message, bot):
 #     response_message = await message.answer(f'Запрос принят, @{message.from_user.username}!\n'

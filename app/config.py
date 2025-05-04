@@ -1,1 +1,2 @@
-BOT_TOKEN = "8111341457:AAHyroBWDDmqFyhsNAXyYMGxrb-W9FWkjZs" #promo spy bot
+BOT_TOKEN = "8111341457:AAGjj-SdqVuWN6lKDQauPznrBwn2s0_1iyE" #promo spy bot
+APIKEY_AI = "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"

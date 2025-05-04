@@ -26,8 +26,8 @@ shops_keyboard = ReplyKeyboardMarkup(keyboard=[
 
 # инлайны в сообщении при start
 websites = ['OZON', 'WB', 'YandexMarket']
-links = ['https://www.ozon.ru/?__rr=1', 'https://www.wildberries.ru/',
-         'https://market.yandex.ru/?ysclid=m9yp7s0d8e142034555&wprid=1745700852778117-6767317144964461245-balancer-l7leveler-kubr-yp-sas-62-BAL&utm_source_service=web&src_pof=703&icookie=k7MJrkMIGRZrw7XKfaE3SGQRHsFgVMw39V1iKXVox%2BuzaVrxjdUK8h%2BwTdRquwgTH%2FoW0XoDG6i3be51WvkgU%2FvtnZ8%3D&baobab_event_id=m9yp7s0d8e']
+links = ['https://www.ozon.ru/', 'https://www.wildberries.ru/',
+         'https://market.yandex.ru/']
 
 async def inline_web():
     keyboard = InlineKeyboardBuilder()
