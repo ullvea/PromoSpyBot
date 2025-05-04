@@ -1,20 +1,11 @@
-# пока здесь парсится озон, но не очень активно ((
-
-# Веб-скрейпинг — это технология получения веб-данных путём извлечения
-# их со страниц веб-ресурсов.
-
-# https://www.selenium.dev/documentation/webdriver/interactions/
-
-
 from selenium.webdriver.common.by import By  # selenium - инструмент для автоматизации приложений
 from selenium.webdriver.common.keys import Keys  # содержит константы, представляющие различные клавиши клавиатуры
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.ui import WebDriverWait
+
 import undetected_chromedriver as uc  # расширение библиотеки Selenium
 
 from bs4 import BeautifulSoup as bs
+
 import asyncio
-import requests
 
 import time
 import json
@@ -24,18 +15,7 @@ WB_url = "https://www.wildberries.ru/"
 YMarket_url = "https://market.yandex.ru/"
 
 TIME_SLEEP = 3
-TIME_WAIT = 5
-page_scroll_down_times = 10
-
-
-class ParcingError(Exception):
-    pass
-
-
-def scroll(driver):
-    for _ in range(page_scroll_down_times):
-        driver.execute_script('window.scrollBy(0, 500)')
-        time.sleep(0.1)
+TIME_WAIT = 2
 
 
 def init_driver(url):

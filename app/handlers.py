@@ -1,12 +1,10 @@
 import asyncio
-import requests
 
 from aiogram import F, Router
 from aiogram.filters import CommandStart, Command
-from aiogram.types import Message, InputMediaPhoto, InputFile, FSInputFile
-import aiohttp
+from aiogram.types import Message, InputMediaPhoto
 
-from app.parcing.parcing import get_info_ozon, get_info_Ymarket
+from parcing.parcing import get_info_ozon, get_info_Ymarket
 
 
 import app.keyboards as kb
@@ -67,12 +65,14 @@ async def get_photo(message: Message):
 
 @router.message(F.text.contains('Добавить в товар в отслеживание 💸'))
 async def common_message(message: Message, bot):
-    await thinking_message(message, bot)
+    #await thinking_message(message, bot)
+    pass
 
 
 @router.message(F.text.contains('Сравнить цены на маркетплейсах 📈'))
 async def common_message(message: Message, bot):
-    await thinking_message(message, bot)
+    #await thinking_message(message, bot)
+    pass
 
 
 @router.message(F.text.contains('Узнать цены похожих на товаров в магазине 🛍️'))
