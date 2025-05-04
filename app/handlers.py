@@ -84,8 +84,31 @@ async def common_message(message: Message, bot):
 
 @router.message(F.text.contains('Сравнить цены на маркетплейсах 📈'))
 async def common_message(message: Message, bot):
-    # await thinking_message(message, bot)
-    pass
+    global PRODUCT
+    thinking_message = await message.answer(f'Запрос принят, @{message.from_user.username}!\n'
+                                            '💭 Ещё чуть-чуть, готовлю ответ...')
+
+
+    results = await asyncio.gather(get_info_Ymarket(PRODUCT, 3), get_info_ozon(PRODUCT, 3))
+    yandex_market_results, ozon_results = results
+    mes = ""
+    photos = []
+    for ans in [yandex_market_results, ozon_results]:
+        if ans == yandex_market_results:
+            mes += '<b>ЯндексМаркет</b>\n'
+        if ans == ozon_results:
+            mes += '<b>Ozon</b>\n'
+        photos += await asyncio.gather(*[download_photo(url['item_card']) for url in ans])
+        for item in ans:
+            mes += format_message(item)
+
+    photos[-1].caption = mes
+    photos[-1].parse_mode = "HTML"
+    await bot.delete_message(thinking_message.chat.id, thinking_message.message_id)
+    # Отправляем группу фотографий
+    await bot.send_media_group(chat_id=message.chat.id, media=photos)
+
+
 
 
 @router.message(F.text.contains('Узнать цены похожих на товаров в магазине 🛍️'))
@@ -110,7 +133,7 @@ async def common_message(message: Message, bot):
     global PRODUCT
     thinking_message = await message.answer(f'Запрос принят, @{message.from_user.username}!\n'
                                             '💭Ещё чуть-чуть, готовлю ответ')
-    ans = get_info_ozon(PRODUCT, 3)
+    ans = await get_info_ozon(PRODUCT, 3)
     mes = ""
     photos = await asyncio.gather(*[download_photo(url['item_card']) for url in ans])
     for item in ans:
@@ -134,7 +157,7 @@ async def common_message(message: Message, bot):
     thinking_message = await message.answer(f'Запрос принят, @{message.from_user.username}!\n'
                                             '💭Ещё чуть-чуть, готовлю ответ')
 
-    ans = get_info_Ymarket(PRODUCT, 3)
+    ans = await get_info_Ymarket(PRODUCT, 3)
     mes = ""
     photos = await asyncio.gather(*[download_photo(url['item_card']) for url in ans])
     for item in ans:

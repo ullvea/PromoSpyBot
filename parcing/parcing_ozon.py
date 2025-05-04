@@ -1,37 +1,37 @@
-from parcing_settings import *
+from parcing.parcing_settings import *
 
-def get_info_ozon(product, count=10):
-    driver = init_driver(OZON_url)
+async def get_info_ozon(product, count=10):
+    driver = await init_driver(OZON_url)
 
     input_window = driver.find_element(By.NAME, 'text')
     input_window.send_keys(product)
-    time.sleep(TIME_SLEEP)
+    await asyncio.sleep(TIME_SLEEP)
 
     input_window.send_keys(Keys.ENTER)
-    time.sleep(TIME_SLEEP)
+    await asyncio.sleep(TIME_SLEEP)
 
     current_url = f'{driver.current_url}'  # параметр с озона
-    time.sleep(TIME_SLEEP)
+    await asyncio.sleep(TIME_SLEEP)
 
     item_links = driver.find_elements(By.CLASS_NAME, 'tile-clickable-element')
     item_links = list(set([f'{item.get_attribute("href")}' for item in item_links]))
 
     products = []
     for link in range(min(len(item_links), count)):
-        products.append(find_info_item(driver, item_links[link]))
+        products.append(await find_info_item(driver, item_links[link]))
         # print(info_of_product)
 
-    driver.close()
-    driver.quit()
+    #driver.close()
+    # driver.quit()
 
     return products
 
 
-def find_info_item(driver, link):
+async def find_info_item(driver, link):
     driver.switch_to.new_window('tab')
     driver.get(link)
 
-    soup = bs(str(driver.page_source), "lxml")
+    soup = bs(str(driver.page_source), "html.parser")
 
     item_name = soup.find(attrs={"data-widget": "webProductHeading"}).get_text(strip=True)
 

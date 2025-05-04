@@ -19,28 +19,28 @@ TIME_SLEEP = 3
 TIME_WAIT = 2
 
 
-def init_driver(url):
+async def init_driver(url):
     driver = uc.Chrome()
     driver.implicitly_wait(TIME_WAIT)
     driver.get(url)
-    time.sleep(TIME_SLEEP)
+    await asyncio.sleep(TIME_SLEEP)
 
     return driver
 
 
-def find_gci(data, v='gci'):
+async def find_gci(data, v='gci'):
     """Рекурсивно находит значение поля 'v'."""
     if isinstance(data, dict):
         for key, value in data.items():
             if key == v:
                 return value
             else:
-                result = find_gci(value, v)
+                result = await find_gci(value, v)
                 if result is not None:
                     return result
     elif isinstance(data, list):
         for item in data:
-            result = find_gci(item, v)
+            result = await find_gci(item, v)
             if result is not None:
                 return result
     return None

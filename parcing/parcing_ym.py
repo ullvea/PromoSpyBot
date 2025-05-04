@@ -1,14 +1,15 @@
-from parcing_settings import *
+from parcing.parcing_settings import *
 
-def get_info_Ymarket(product, count=10):
-    driver = init_driver(YMarket_url)
+
+async def get_info_Ymarket(product, count=10):
+    driver = await init_driver(YMarket_url)
 
     input_window = driver.find_element(By.NAME, 'text')
     input_window.send_keys(product)
-    time.sleep(TIME_SLEEP)
+    await asyncio.sleep(TIME_SLEEP)
 
     input_window.send_keys(Keys.ENTER)
-    time.sleep(TIME_SLEEP)
+    await asyncio.sleep(TIME_SLEEP)
 
     # <div data-cs-name="navigate"
 
@@ -17,20 +18,20 @@ def get_info_Ymarket(product, count=10):
     products = []
 
     for link in range(min(len(item_links), count)):
-        products.append(find_info_item_ymarket(driver, item_links[link]))
+        products.append(await find_info_item_ymarket(driver, item_links[link]))
 
 
-    driver.close()
-    driver.quit()
+    #driver.close()
+    # driver.quit()
 
     return products
 
 
-def find_info_item_ymarket(driver, link):
+async def find_info_item_ymarket(driver, link):
     driver.switch_to.new_window('tab')
     driver.get(link)
 
-    soup = bs(str(driver.page_source), "lxml")
+    soup = bs(str(driver.page_source), "html.parser")
 
     jsons = soup.find_all('script', type='application/ld+json')
     for js in jsons:
@@ -40,8 +41,12 @@ def find_info_item_ymarket(driver, link):
             item_card = state_json['image']
             item_statistic = state_json['offers']
             item_price_with_card = item_statistic['price']
-            item_raiting = state_json['aggregateRating']['ratingValue']
-            item_number_of_comments = state_json['aggregateRating']['ratingCount']
+            try:
+                item_raiting = state_json['aggregateRating']['ratingValue']
+                item_number_of_comments = state_json['aggregateRating']['ratingCount']
+            except Exception:
+                item_raiting = 'Не найдено'
+                item_number_of_comments = 'Не найдено'
             item_price = None
             item_article = None
 
@@ -52,9 +57,9 @@ def find_info_item_ymarket(driver, link):
                 content = tag.string.strip()
                 data = json.loads(content)
                 if "@card/VerifiedBadge" in data["widgets"].keys():
-                    item_article = find_gci(data)
+                    item_article = await find_gci(data)
                 if "@market/Ecommerce" in data["widgets"].keys() and item_price is None:
-                    item_price = find_gci(data, 'price')
+                    item_price = await find_gci(data, 'price')
 
             d = {"item_name": item_name,
                  "item_article": item_article,
