@@ -10,8 +10,8 @@ start_keyboard = ReplyKeyboardMarkup(keyboard=[
 
 help_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Сравнить цены на маркетплейсах 📈'),
-     KeyboardButton(text='Добавить в товар в отслеживание 💸')],
-    [KeyboardButton(text='Узнать цены похожих на товаров в магазине 🛍️')],
+     KeyboardButton(text='Добавить товар в отслеживание 💸')],
+    [KeyboardButton(text='Узнать цены похожих товаров в магазине 🛍️')],
     [KeyboardButton(text='Узнай как пользоваться ботом 🤖')]
 ], resize_keyboard=True)
 
